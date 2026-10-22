@@ -155,6 +155,9 @@ void DeleteInterfaceFiles() {
     for (uint32_t i = 0; i < sizeof(directories) / sizeof(directories[0]); i++) {
         const char* directory = directories[i];
 
+#ifdef DISABLE_SIGNATURE_CHECKS
+        continue;  // TBV: allow edited loose GlueXML/FrameXML (matches the AllowInterfaceEdits exe patch)
+#endif
         if (OsDirectoryExists(directory)) {
             char oldPath[260];
             SStrPrintf(oldPath, sizeof(oldPath), "%s.old", directory);

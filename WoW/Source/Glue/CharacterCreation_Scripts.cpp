@@ -309,7 +309,28 @@ static int32_t Script_CycleCharCustomization(lua_State* L) {
     CHAR_CUSTOMIZATION_TYPE type = static_cast<CHAR_CUSTOMIZATION_TYPE>(static_cast<int32_t>(lua_tonumber(L, 1)) - 1);
     int32_t delta = static_cast<int32_t>(lua_tonumber(L, 2));
     CCharacterCreation::CycleCharCustomization(type, delta);
-    return 0;
+
+    // TBV: return the value after cycling, so CycleCharCustomization(i, 0) is a getter. The goblin
+    // Jaw/Facial Hair buttons share the facial index (jaw * beards + beard) and need to read it.
+    // Returns -1 while no character model exists.
+    double value = -1.0;
+    CCharacterComponent* character = CCharacterCreation::m_character;
+
+    if (character) {
+        const CharacterPreferences& prefs = character->m_data.m_preferences;
+
+        switch (type) {
+            case CHAR_CUSTOMIZATION_SKIN: value = prefs.m_skinID; break;
+            case CHAR_CUSTOMIZATION_FACE: value = prefs.m_faceId; break;
+            case CHAR_CUSTOMIZATION_HAIR_STYLE: value = prefs.m_hairStyleId; break;
+            case CHAR_CUSTOMIZATION_HAIR_COLOR: value = prefs.m_hairColorId; break;
+            case CHAR_CUSTOMIZATION_FACIAL_FEATURE: value = prefs.m_facialHairId; break;
+            default: break;
+        }
+    }
+
+    lua_pushnumber(L, value);
+    return 1;
 }
 
 // VERIFY: e5380494 auto

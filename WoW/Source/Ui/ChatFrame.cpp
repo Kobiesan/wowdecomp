@@ -2007,6 +2007,13 @@ void CGChat::TranslateMessage(uint32_t language, uint32_t skill, const char* tex
         SErrDisplayAppFatalMessage("", "", 0);
     }
 
+    // TBV: never translate on the client; the server decides what each player can read
+    // (matches the RemoveLanguageTranslate exe patch). Set TBV_CLIENT_LANGUAGE_TRANSLATE to restore.
+#ifndef TBV_CLIENT_LANGUAGE_TRANSLATE
+    SStrCopy(buffer, text, size);
+    return;
+#endif
+
     if (!language) {
         SStrCopy(buffer, text, size);
         return;

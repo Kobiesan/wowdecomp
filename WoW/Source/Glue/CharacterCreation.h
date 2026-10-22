@@ -14,7 +14,8 @@ struct CharacterPreferences;
 
 class CCharacterCreation {
     public:
-    static CharacterPreferences* m_charPreferences[22][2];
+    // TBV: 32 race slots (stock 22) so custom race IDs above 21 do not overflow.
+    static CharacterPreferences* m_charPreferences[32][2];
     static CCharacterComponent* m_character;
     static CNameGen m_nameGen;
     static CSimpleModelFFX* m_charCustomizeFrame;
