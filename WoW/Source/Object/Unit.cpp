@@ -172,7 +172,7 @@ int32_t CGUnit::CanMove() const {
 
 // VERIFY: 68641d42 auto
 // OFFSET: 0x004D4240
-uint32_t CGUnit::DescriptorToMirrorOffset(uint32_t offset, uint32_t a2, uint32_t a3, uint32_t base) {
+uint32_t CGUnit::DescriptorToMirrorOffset(uint32_t offset, uint32_t unused_a2, uint32_t unused_a3, uint32_t base) {
     int32_t objectFields = CGObject::TotalFieldsSaved();
     return (offset & 3) + 4 * (objectFields + MirrorIndexFromFieldIndex((offset - base) >> 2));
 }
@@ -191,7 +191,7 @@ float CGUnit::GetFacing(float facing) const {
 
 // VERIFY: 5712b6fb manual
 // OFFSET: 0x004F5300
-float __stdcall CGUnit::GetPowerRegenBase(int32_t powerType, uint8_t inCombat) {
+float __stdcall CGUnit::GetPowerRegenBase(POWER_TYPE powerType, uint8_t inCombat) {
     static float s_regen[7][2] = {
         { 0.0f, 0.0f },
         { -12.5f, 0.0f },
@@ -207,7 +207,7 @@ float __stdcall CGUnit::GetPowerRegenBase(int32_t powerType, uint8_t inCombat) {
 
 // VERIFY: 5dbc6590 auto
 // OFFSET: 0x004F5390
-float CGUnit::GetPowerRegen(int32_t powerType, bool inCombat) const {
+float CGUnit::GetPowerRegen(POWER_TYPE powerType, bool inCombat) const {
     if (inCombat) {
         return CGUnit::GetPowerRegenBase(powerType, 1) + this->m_unit->m_unitFieldPowerRegenInterruptedFlatModifier[powerType];
     }

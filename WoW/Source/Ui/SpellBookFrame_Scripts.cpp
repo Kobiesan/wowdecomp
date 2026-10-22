@@ -78,8 +78,8 @@ static int32_t Script_GetKnownSlotFromHighestRankSlot(lua_State* L) {
     uint32_t slot = lua_tointeger(L, 1) - 1;
     int32_t index = -1;
 
-    if (slot < s_unkBE8D9C) {
-        int32_t spell = s_unkBE5D88[slot];
+    if (slot < s_displayedSpellCount) {
+        int32_t spell = s_displayedSpells[slot];
 
         for (uint32_t i = 0; i < s_numSpells; i++) {
             if (s_spellList[i] == spell) {
@@ -1232,8 +1232,8 @@ static int32_t Script_GetSpellInfo(lua_State* L) {
 
     uint32_t powerCost = Spell_C_GetPowerCost(&spell, caster);
     uint32_t powerCostPerSecond = Spell_C_GetPowerCostPerSecond(&spell, caster);
-    uint32_t cost = powerCost / Spell_C_GetPowerDisplayMod(spell.m_powerType);
-    int32_t costPerSecond = powerCostPerSecond / Spell_C_GetPowerDisplayMod(spell.m_powerType);
+    uint32_t cost = powerCost / Spell_C_GetPowerDisplayMod(static_cast<POWER_TYPE>(spell.m_powerType));
+    int32_t costPerSecond = powerCostPerSecond / Spell_C_GetPowerDisplayMod(static_cast<POWER_TYPE>(spell.m_powerType));
 
     if (costPerSecond <= 0) {
         lua_pushnumber(L, cost);

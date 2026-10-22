@@ -10,6 +10,7 @@
 #include "Engine/Source/Base/Handle.h"
 #include "WoW/Source/Object/WGUID.h"
 #include "WoW/Source/UIUtil/CSimpleCamera.h"
+#include "WoW/Source/UIUtil/Types.h"
 #include "Engine/Source/Services/CameraInt.h"
 
 class CGObject_C;
@@ -18,6 +19,29 @@ class CM2Model;
 class CRect;
 class CVehicleCamera_C;
 struct CVar;
+
+struct CameraView {
+    float m_distance;
+    float m_pitch;
+    float m_yaw;
+
+    // Component order follows the distance/pitch/yaw CVar columns.
+    float& Component(uint32_t component) {
+        switch (component) {
+            case 0: return m_distance;
+            case 1: return m_pitch;
+            default: return m_yaw;
+        }
+    }
+
+    const float& Component(uint32_t component) const {
+        switch (component) {
+            case 0: return m_distance;
+            case 1: return m_pitch;
+            default: return m_yaw;
+        }
+    }
+};
 
 class CAMERA_DEFAULTS {
     public:
@@ -36,7 +60,7 @@ class CAMERA_SMOOTH {
 
 struct CameraShake : public TSLinkedNode<CameraShake> {
     /* 0008 */ int32_t m_type;
-    /* 000C */ int32_t m_dir;
+    /* 000C */ CGCameraDir m_dir;
     /* 0010 */ float m_amplitude;
     /* 0014 */ float m_frequency;
     /* 0018 */ float m_duration;
@@ -75,7 +99,7 @@ class CGCamera : public CSimpleCamera {
     static uint32_t GetCollisionQueryFlags();
     static float GetDefaultZoomMaxDistance();
     float GetDefaultZoomMinDistance();
-    static void __stdcall AddShakeOffset(C3Vector& offset, float facing, float amplitude, float time, float frequency, int32_t type, float damping, int32_t dir);
+    static void __stdcall AddShakeOffset(C3Vector& offset, float facing, float amplitude, float time, float frequency, int32_t type, float damping, CGCameraDir dir);
     void SetPositionAndTargetWithRoll(const C3Vector& position, const C3Vector& target, float roll);
     void CommentatorSetViewAndPosition(const C3Vector& position, float facing, float pitch);
     void BarberShopSetView(float distance, float facing, float pitch);
@@ -83,9 +107,9 @@ class CGCamera : public CSimpleCamera {
 
     /* 0048 */ CM2Model* m_model;
     /* 004C */ uint32_t m_someTime;
-    /* 0050 */ HOBJECT unk_0050;
+    /* 0050 */ HOBJECT m_modelCameraHandle;
     /* 0054 */ C34Matrix m_modelMatrix;
-    /* 0084 */ uint32_t unk_0084;
+    /* 0084 */ uint32_t unused_0084;
     /* 0088 */ WOWGUID m_targetGUID;
     /* 0090 */ WOWGUID m_guid0090;
     /* 0098 */ uint32_t m_state;
@@ -95,7 +119,7 @@ class CGCamera : public CSimpleCamera {
     /* 00AC */ int32_t m_ignoreFacingRefs;
     /* 00B0 */ int32_t m_groundTiltRefs;
     /* 00B4 */ uint32_t m_viewIndex;
-    /* 00B8 */ float m_views [8][3];
+    /* 00B8 */ CameraView m_views [8];
     /* 0118 */ float m_distance;
     /* 011C */ float m_yaw;
     /* 0120 */ float m_pitch;
@@ -118,10 +142,10 @@ class CGCamera : public CSimpleCamera {
     /* 0194 */ uint32_t m_motionEndTime [6];
     /* 01AC */ float m_motionSpeed [6];
     /* 01C4 */ C3Vector m_targetPosition;
-    /* 01D0 */ float unk_01D0;
+    /* 01D0 */ float unused_01D0;
     /* 01D4 */ float m_targetFacing;
     /* 01D8 */ uint32_t m_terrainTiltTime;
-    /* 01DC */ float unk_01DC;
+    /* 01DC */ float m_freeLookYaw;
     /* 01E0 */ CAMERA_SMOOTH m_smoothDistance;
     /* 01F8 */ CAMERA_SMOOTH m_smoothGroundTilt;
     /* 0210 */ CAMERA_SMOOTH m_smoothHeight;
@@ -132,7 +156,7 @@ class CGCamera : public CSimpleCamera {
     /* 0288 */ uint32_t m_bobTime;
     /* 028C */ float m_bobDuration;
     /* 0290 */ C3Vector m_bobStart;
-    /* 029C */ uint32_t unk_029C;
+    /* 029C */ uint32_t unused_029C;
     /* 02A0 */ int32_t m_underwater;
     /* 02A4 */ uint32_t m_wasFlying;
     /* 02A8 */ CAMERA_SMOOTH m_smoothFlyingHeight;
@@ -155,8 +179,8 @@ class CGCamera : public CSimpleCamera {
     /* 0300 */ TSList<CameraShake> m_cameraShakeList;
     /* 030C */ uint32_t m_prevViewIndex;
     /* 0310 */ float m_prevDistance;
-    /* 0314 */ float unk_0314;
-    /* 0318 */ float unk_0318;
+    /* 0314 */ float m_preTelescopeDistance;
+    /* 0318 */ float m_telescopePitchOffset;
     /* 031C */ CVehicleCamera_C* m_vehicleCamera;
 
     float FOV() const override;
@@ -166,7 +190,7 @@ class CGCamera : public CSimpleCamera {
 
     CGCamera();
     ~CGCamera();
-    void AddShake(const C3Vector& position, int32_t type, int32_t dir, float amplitude, float frequency, float duration, float timeOffset, float damping);
+    void AddShake(const C3Vector& position, int32_t type, CGCameraDir dir, float amplitude, float frequency, float duration, float timeOffset, float damping);
     void AddShakeById(int32_t shakeId, const C3Vector* position);
     void BeginBobbingSmooth();
     void CalcTerrainTilt(CGObject_C* target, uint32_t time);

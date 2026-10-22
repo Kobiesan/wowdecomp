@@ -77,6 +77,11 @@ enum EGxBuffer {
     GxBuffers_Last = 2,
 };
 
+enum EGxBufferBit : uint32_t {
+    GxBufferBit_Color = 0x1,
+    GxBufferBit_Depth = 0x2,
+};
+
 enum EGxOverride {
     GxOverride_PixelShader = 0,
     GxOverride_Unk1 = 1,
@@ -191,7 +196,7 @@ class CGxCaps {
     /* 0004 */ int32_t m_pixelCenterOnEdge;
     /* 0008 */ int32_t m_texelCenterOnEdge;
     /* 000C */ int32_t m_numStreams;
-    /* 0010 */ int32_t unk_0010;
+    /* 0010 */ int32_t m_streamOffset;
     /* 0014 */ EGxColorFormat m_colorFormat;
     /* 0018 */ int32_t unk_0018;
     /* 001C */ uint32_t m_maxIndex;
@@ -216,10 +221,10 @@ class CGxCaps {
     /* 0108 */ float m_pointScaleMax;
     /* 010C */ int32_t m_pointSprite;
     /* 0110 */ uint32_t m_blendFactor;
-    /* 0114 */ uint32_t unk_0114 [5];
+    /* 0114 */ uint32_t unused_0114 [5];
     /* 0128 */ int32_t m_oglRtAlpha;
     /* 012C */ int32_t m_stereoAvailable;
-    /* 0130 */ int32_t unk_0130;
+    /* 0130 */ int32_t m_shaderAlphaRef;
     /* 0134 */ int32_t unk_0134;
     /* 0138 */ int32_t unk_0138;
 };

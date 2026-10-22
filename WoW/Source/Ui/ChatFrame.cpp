@@ -805,7 +805,7 @@ void CGChat::QueueChatText(const char* text, int32_t type, const char* senderNam
     chat->m_targetName = targetName ? SStrDupA(targetName, __FILE__, __LINE__) : nullptr;
     chat->m_language = language;
     chat->m_queued = queued;
-    chat->unk_0030 = a9;
+    chat->unused_0030 = a9;
     chat->m_achievementID = achievementID;
     chat->m_isGM = isGM;
     chat->m_conversation = conversation ? new (SMemAlloc(sizeof(ChatConversation), __FILE__, __LINE__, 0)) ChatConversation(*conversation) : nullptr;
@@ -4049,7 +4049,7 @@ void CGChat::EnterWorld() {
 
 // VERIFY: bff5dc80 manual
 // OFFSET: 0x0050BA10
-void CGChat::LogReactionChanged(int32_t faction, int32_t reaction) {
+void CGChat::LogReactionChanged(int32_t faction, UNIT_REACTION reaction) {
     FactionRec* rec = g_factionDB.GetRecord(faction);
 
     if (!rec) {

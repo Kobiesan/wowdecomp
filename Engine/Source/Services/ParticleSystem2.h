@@ -68,7 +68,19 @@ class CSortableParticleQueue : public CMemBlock {
 };
 
 class CParticleEmitter2 {
+    protected:
+    static const float VEL_UPDATE_TIME;
+    static const float MIN_ZSOURCE;
+
     public:
+    enum PARTICLE_EMITTER_TYPE : int32_t {
+        PET_BASE_EMITTER = 0,
+        PET_PLANE_EMITTER = 1,
+        PET_SPHERE_EMITTER = 2,
+        PET_SPLINE_EMITTER = 3,
+        PET_NUMS_PETS = 4,
+    };
+
     struct ParticleVertex {
         /* 0000 */ uint8_t* m_position;
         /* 0004 */ uint8_t* m_normal;
@@ -148,7 +160,7 @@ class CParticleEmitter2 {
     /* 0014 */ float m_textureCellHeight;
     /* 0018 */ uint32_t m_priorityPlane;
     /* 001C */ uint32_t m_renderedParticles;
-    /* 0020 */ int32_t m_emitterType;
+    /* 0020 */ PARTICLE_EMITTER_TYPE m_emitterType;
     /* 0024 */ CRndSeed m_random;
     /* 002C */ TSGrowableArray<CParticle2> m_particles;
     /* 003C */ TSGrowableArray<CParticle2_Model> m_particleModels;
@@ -161,12 +173,12 @@ class CParticleEmitter2 {
     /* 0088 */ CM2Model* m_childModel;
     /* 008C */ uint32_t m_vertsPerParticle;
     /* 0090 */ uint32_t m_indicesPerParticle;
-    /* 0094 */ uint32_t unk_0094;
+    /* 0094 */ uint32_t unused_0094;
     /* 0098 */ CParticleEmitter2::Params m_params;
     /* 0120 */ uint32_t m_textureRows;
     /* 0124 */ uint32_t m_textureCols;
     /* 0128 */ CTexture* m_texture;
-    /* 012C */ uint32_t unk_012C;
+    /* 012C */ uint32_t unused_012C;
     /* 0130 */ float m_alphaScale;
     /* 0134 */ uint32_t m_flags;
     /* 0138 */ uint32_t m_batchFlags;
@@ -194,12 +206,12 @@ class CParticleEmitter2 {
     /* 01DC */ float m_ivelTimer;
     /* 01E0 */ C3Vector m_parentVelocity;
     /* 01EC */ float m_xformScale;
-    /* 01F0 */ uint32_t unk_01F0;
+    /* 01F0 */ uint32_t unused_01F0;
     /* 01F4 */ C3Vector m_followOffset;
     /* 0200 */ C3Vector m_burstOffset;
     /* 020C */ C3Vector m_billboardAxis;
     /* 0218 */ CAaBox m_worldBounds;
-    /* 0230 */ uint32_t unk_0230;
+    /* 0230 */ uint32_t unused_0230;
 
     virtual void Sync();
     virtual void CreateParticle(CParticle2& particle, float time, const C44Matrix& transform);

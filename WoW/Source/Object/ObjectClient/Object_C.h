@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "WoW/Source/Object/ObjectClient/Types.h"
 #include <windows.h>
 #include "Engine/Source/Storm/H/stpl.h"
 #include "WoW/Source/Object/Object.h"
@@ -117,7 +118,7 @@ class CGObject_C : public CGObject, public TSHashObject<CGObject_C, CHashKeyGUID
     virtual void HandleOutOfRange(OUT_OF_RANGE_TYPE type);
     virtual void UpdateWorldObject(int32_t a2);
     virtual int32_t ShouldFadeout();
-    virtual void UpdateDisplayInfo(int32_t a2);
+    virtual void UpdateDisplayInfo(int32_t force);
     virtual C3Vector GetNamePosition() const;
     virtual CGBag_C* GetBag();
     virtual const CGBag_C* GetBag() const;
@@ -146,22 +147,22 @@ class CGObject_C : public CGObject, public TSHashObject<CGObject_C, CHashKeyGUID
     virtual void ApplyAlpha(uint32_t time);
     virtual void PreAnimate(CGWorldFrame* frame);
     virtual int32_t Animate(float elapsed);
-    virtual void ShouldRender(uint32_t flags, int32_t& render, int32_t& a3);
+    virtual void ShouldRender(uint32_t flags, int32_t& render, int32_t& hidden);
     virtual float GetRenderFacing() const;
     virtual void OnSpecialMountAnim();
     virtual int32_t IsSolidSelectable() const;
-    virtual int32_t IsCollidable(int32_t a1) const;
+    virtual int32_t IsCollidable(int32_t flags) const;
     virtual int32_t CanHighlight() const;
     virtual int32_t CanBeTargetted() const;
     virtual int32_t FloatingTooltip() const;
     virtual void OnRightClick();
     virtual int32_t IsHighlightSuppressed() const;
     virtual void OnSpellEffectClear(CEffect* effect);
-    virtual const SpellVisualRec* GetAppropriateSpellVisual(const SpellRec* spell, SpellVisualRec& visual, int32_t a3, int32_t a4) const;
-    virtual void ConnectToLightningThisFrame(uint32_t a1, int32_t a2);
+    virtual const SpellVisualRec* GetAppropriateSpellVisual(const SpellRec* spell, SpellVisualRec& visual, int32_t visualId, int32_t lowViolenceVisualId) const;
+    virtual void ConnectToLightningThisFrame(uint32_t spellId, int32_t attachment);
     virtual C44Matrix GetMatrix() const;
     virtual void ObjectNameVisibilityChanged();
-    virtual int32_t UpdateObjectNameString(int32_t a1, char* buffer, uint32_t size);
+    virtual int32_t UpdateObjectNameString(int32_t flags, char* buffer, uint32_t size);
     virtual int32_t ShouldRenderObjectName(uint32_t flags) const;
     virtual CM2Model* GetObjectModel() const;
     virtual const char* GetObjectName() const;
@@ -187,7 +188,7 @@ class CGObject_C : public CGObject, public TSHashObject<CGObject_C, CHashKeyGUID
     C3Vector GetModelPosition();
     int32_t GetQuestGiverCursor(int32_t highlighted);
     void HandleScaleUpdate(float scale);
-    void HideHighlightType(int32_t type);
+    void HideHighlightType(HIGHLIGHTTYPE type);
     void AddWorldObject();
     int32_t IsObjectLocked();
     int32_t IsObjectModelLoaded();
@@ -205,7 +206,7 @@ class CGObject_C : public CGObject, public TSHashObject<CGObject_C, CHashKeyGUID
     void SetQuestStatus(uint32_t status);
     void SetStorage(uint32_t* storage, uint32_t* saved);
     void SetTypeID(OBJECT_TYPE_ID typeId);
-    void ShowHighlightType(int32_t type);
+    void ShowHighlightType(HIGHLIGHTTYPE type);
     void UpdateEffectAttachments();
     void Fadeout();
     static void __stdcall BuildSelectionRotMatrix(C44Matrix* matrix, const C3Vector* position);

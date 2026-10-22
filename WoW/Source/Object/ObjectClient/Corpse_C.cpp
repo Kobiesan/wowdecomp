@@ -269,8 +269,8 @@ int32_t CGCorpse_C::CanHighlight() const {
 // VERIFY: 5ae4217a auto
 // OFFSET: 0x007062C0
 void CGCorpse_C::Initialize() {
-    ClntObjMgrSetTypeMirrorHandler(ID_CORPSE, offsetof(CGCorpseData, m_corpseFieldFlags), sizeof(uint32_t), CorpseFlagUpdateHandler, nullptr, static_cast<HANDLER_PRIORITY>(0), 0);
-    ClntObjMgrSetTypeMirrorHandler(ID_CORPSE, offsetof(CGCorpseData, m_corpseFieldDynamicFlags), sizeof(uint32_t), CorpseDynamicFlagUpdateHandler, nullptr, static_cast<HANDLER_PRIORITY>(0), 0);
+    ClntObjMgrSetTypeMirrorHandler(ID_CORPSE, offsetof(CGCorpseData, m_corpseFieldFlags), sizeof(uint32_t), CorpseFlagUpdateHandler, nullptr, HANDLER_PRIORITY_NORMAL, 0);
+    ClntObjMgrSetTypeMirrorHandler(ID_CORPSE, offsetof(CGCorpseData, m_corpseFieldDynamicFlags), sizeof(uint32_t), CorpseDynamicFlagUpdateHandler, nullptr, HANDLER_PRIORITY_NORMAL, 0);
 }
 
 // VERIFY: b1c4d0d1 auto
@@ -439,15 +439,15 @@ int32_t CGCorpse_C::GetModelFileName(const char** name) const {
 
 // VERIFY: abe6008c auto
 // OFFSET: 0x007057E0
-void CGCorpse_C::ShouldRender(uint32_t flags, int32_t& render, int32_t& a3) {
-    CGObject_C::ShouldRender(flags, render, a3);
+void CGCorpse_C::ShouldRender(uint32_t flags, int32_t& render, int32_t& hidden) {
+    CGObject_C::ShouldRender(flags, render, hidden);
 
-    if (render || a3) {
+    if (render || hidden) {
         if (this->m_component) {
             this->m_component->Prep();
         }
     } else if (((this->m_corpseFlags & 0x2) && (this->m_corpse->m_corpseFieldFlags & 0x1)) || (this->m_component && !this->m_component->RenderPrep(0))) {
-        a3 = 1;
+        hidden = 1;
     }
 }
 

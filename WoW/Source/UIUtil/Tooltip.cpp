@@ -905,8 +905,8 @@ void CGTooltip::ClearTooltip() {
 
     this->m_unitGuid = WOWGUID();
     this->m_objectGuid = WOWGUID();
-    this->unk_0338 = 0;
-    this->unk_033C = 0;
+    this->unused_0338 = 0;
+    this->unused_033C = 0;
     this->m_corpseGuid.m_guid = 0;
     this->m_healthGuid = WOWGUID();
     this->m_itemId = 0;
@@ -1112,8 +1112,8 @@ CGTooltip::CGTooltip(CSimpleFrame* parent) : CSimpleFrame(parent) {
     this->m_numTextures = 0;
     this->m_unitGuid = WOWGUID();
     this->m_objectGuid = WOWGUID();
-    this->unk_0338 = 0;
-    this->unk_033C = 0;
+    this->unused_0338 = 0;
+    this->unused_033C = 0;
     this->m_itemGuid = WOWGUID();
     this->m_corpseGuid.m_guid = 0;
     this->m_healthGuid = WOWGUID();
@@ -1778,7 +1778,7 @@ int32_t CGTooltip::SetUnit(const WOWGUID& guid, int32_t showHealth, const WOWGUI
     if (this->m_statusBar && showHealth) {
         this->m_healthGuid = healthGuid ? healthGuid : this->m_unitGuid;
         CGUnit_C* healthUnit = static_cast<CGUnit_C*>(ClntObjMgrObjectPtr(this->m_healthGuid, TYPEMASK_UNIT, __FILE__, __LINE__));
-        ClntObjMgrSetObjMirrorHandler(this->m_healthGuid, ID_UNIT, offsetof(CGUnitData, m_unitFieldHealth), sizeof(int32_t), HealthUpdateHandler, this->m_statusBar, static_cast<HANDLER_PRIORITY>(0), 0);
+        ClntObjMgrSetObjMirrorHandler(this->m_healthGuid, ID_UNIT, offsetof(CGUnitData, m_unitFieldHealth), sizeof(int32_t), HealthUpdateHandler, this->m_statusBar, HANDLER_PRIORITY_NORMAL, 0);
 
         float maxHealth;
 
@@ -1895,14 +1895,14 @@ int32_t CGTooltip::SetUnit(const WOWGUID& guid, int32_t showHealth, const WOWGUI
 
         if (unit->GetCreatureType() != 10) {
             if (activePlayer) {
-                if (activePlayer->UnitReaction(unit) < 4 && !activePlayer->IsTreatAsRaidUnit()) {
+                if (activePlayer->UnitReaction(unit) < UNIT_REACTION_FRIENDLY && !activePlayer->IsTreatAsRaidUnit()) {
                     creatureType = g_creatureTypeDB.GetRecord(unit->GetCreatureType());
                 }
             }
         }
 
         if (unit->GetCreatureType() == 10 || activePlayer) {
-            if (activePlayer && unit->UnitReaction(activePlayer) <= 1 && static_cast<int32_t>(activePlayer->m_unit->m_unitFieldLevel) <= unitLevel - 10) {
+            if (activePlayer && unit->UnitReaction(activePlayer) <= UNIT_REACTION_HOSTILE && static_cast<int32_t>(activePlayer->m_unit->m_unitFieldLevel) <= unitLevel - 10) {
                 showLevel = 0;
             }
         }
@@ -2210,8 +2210,8 @@ void CGTooltip::SetCorpse(const WOWGUID& guid) {
     }
 
     this->m_corpseGuid = guid;
-    *reinterpret_cast<WOWGUID*>(&this->unk_0350) = corpse->m_corpse->m_corpseFieldOwner;
-    NameCache* name = g_nameDBCache.GetRecord(reinterpret_cast<WOWGUID*>(&this->unk_0350)->m_guid, *reinterpret_cast<WOWGUID*>(&this->unk_0350), TooltipCorpseCallback, this, true);
+    *reinterpret_cast<WOWGUID*>(&this->m_corpseOwnerGuid) = corpse->m_corpse->m_corpseFieldOwner;
+    NameCache* name = g_nameDBCache.GetRecord(reinterpret_cast<WOWGUID*>(&this->m_corpseOwnerGuid)->m_guid, *reinterpret_cast<WOWGUID*>(&this->m_corpseOwnerGuid), TooltipCorpseCallback, this, true);
 
     if (name) {
         char line[1024];
@@ -2597,11 +2597,11 @@ void CGTooltip::AddTalentLearnText(const TalentRec* talent, CGTalentGroup_C* gro
 static int32_t SetSpellPowerCost(char* cost, const SpellRec* spell, const CGUnit_C* caster, int32_t powerCost, const PowerDisplayRec* display) {
     char format[128];
     int32_t costPerSecond = Spell_C_GetPowerCostPerSecond(spell, caster);
-    powerCost = static_cast<uint32_t>(powerCost) / Spell_C_GetPowerDisplayMod(spell->m_powerType);
-    costPerSecond = static_cast<uint32_t>(costPerSecond) / Spell_C_GetPowerDisplayMod(spell->m_powerType);
+    powerCost = static_cast<uint32_t>(powerCost) / Spell_C_GetPowerDisplayMod(static_cast<POWER_TYPE>(spell->m_powerType));
+    costPerSecond = static_cast<uint32_t>(costPerSecond) / Spell_C_GetPowerDisplayMod(static_cast<POWER_TYPE>(spell->m_powerType));
     const char* token = static_cast<uint32_t>(spell->m_powerType) > 6 ? "HEALTH_COST" : s_powerCostTokens[spell->m_powerType];
 
-    if (spell->m_powerType == 5) {
+    if (spell->m_powerType == POWER_TYPE_RUNES) {
         SpellRuneCostRec* runes = g_spellRuneCostDB.GetRecord(spell->m_runeCostID);
 
         if (!runes) {
@@ -7981,7 +7981,7 @@ void CGTooltip::SetObject(const WOWGUID& guid) {
 
     if (this->m_statusBar && object->m_gameObject->m_typeID == 33) {
         this->m_healthGuid = this->m_objectGuid;
-        ClntObjMgrSetObjMirrorHandler(this->m_healthGuid, ID_GAMEOBJECT, offsetof(CGGameObjectData, m_animProgress), sizeof(uint8_t), ObjHealthUpdateHandler, this->m_statusBar, static_cast<HANDLER_PRIORITY>(0), 0);
+        ClntObjMgrSetObjMirrorHandler(this->m_healthGuid, ID_GAMEOBJECT, offsetof(CGGameObjectData, m_animProgress), sizeof(uint8_t), ObjHealthUpdateHandler, this->m_statusBar, HANDLER_PRIORITY_NORMAL, 0);
         this->m_statusBar->SetMinMaxValues(0.0f, 1.0f);
         this->m_statusBar->SetValue(static_cast<float>(object->m_gameObject->m_animProgress) * 0.0039215689f);
         this->m_statusBar->Show();

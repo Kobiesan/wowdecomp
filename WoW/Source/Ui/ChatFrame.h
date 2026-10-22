@@ -7,6 +7,7 @@
 #include "Engine/Source/Tempest/CImVector.h"
 #include "WoW/Source/Net/Types.h"
 #include "WoW/Source/Object/WGUID.h"
+#include "WoW/Source/Object/ObjectClient/Types.h"
 #include "WoW/Source/WowSvcs/WowSvcsClient/AccountData.h"
 #include "WoW/Source/Ui/Types.h"
 
@@ -91,7 +92,7 @@ struct RaidInstanceInfo {
     /* 0010 */ uint32_t m_locked;
     /* 0014 */ uint32_t m_extended;
     /* 0018 */ uint32_t m_resetTime;
-    /* 001C */ uint32_t unk_001C;
+    /* 001C */ uint32_t unused_001C;
 };
 
 struct ChatConversation {
@@ -103,7 +104,7 @@ struct ChatConversation {
 struct PENDINGCHAT {
     /* 0000 */ TSLink<PENDINGCHAT> m_link;
     /* 0008 */ int32_t m_type;
-    /* 000C */ uint32_t unk_000C;
+    /* 000C */ uint32_t unused_000C;
     /* 0010 */ WOWGUID m_senderGuid;
     /* 0018 */ uint32_t m_senderUnk;
     /* 001C */ char* m_text;
@@ -111,15 +112,15 @@ struct PENDINGCHAT {
     /* 0024 */ char* m_targetName;
     /* 0028 */ uint32_t m_language;
     /* 002C */ int32_t m_queued;
-    /* 0030 */ int32_t unk_0030;
+    /* 0030 */ int32_t unused_0030;
     /* 0034 */ char m_channelName[128];
-    /* 00B4 */ uint32_t unk_00B4;
+    /* 00B4 */ uint32_t unused_00B4;
     /* 00B8 */ WOWGUID m_targetGuid;
     /* 00C0 */ char m_flags[5];
     /* 00C8 */ int32_t m_achievementID;
     /* 00CC */ bool m_isGM;
     /* 00D0 */ ChatConversation* m_conversation;
-    /* 00D4 */ uint32_t unk_00D4;
+    /* 00D4 */ uint32_t unused_00D4;
 
     PENDINGCHAT() : m_text(nullptr), m_senderName(nullptr), m_conversation(nullptr) {
     }
@@ -158,7 +159,7 @@ class PROFANITYCHECK : public TSHashObject<PROFANITYCHECK, HASHKEY_STR> {
 struct PENDINGUSERLIST : public TSLinkedNode<PENDINGUSERLIST> {
     /* 0008 */ WOWGUID m_guid;
     /* 0010 */ uint8_t m_flags;
-    /* 0014 */ uint32_t unk_0014;
+    /* 0014 */ uint32_t unused_0014;
 };
 
 class ChatChannel {
@@ -263,7 +264,7 @@ struct ChatRecord {
     /* 17B0 */ uint32_t m_unk17B0;
     /* 17B4 */ uint32_t m_lineID;
     /* 17B8 */ uint32_t m_time;
-    /* 17BC */ uint32_t unk_17BC;
+    /* 17BC */ uint32_t unused_17BC;
 };
 
 struct ChatColorInfo {
@@ -282,7 +283,7 @@ class CGChat {
     static void SaveChatSettings();
     static void ZoneUpdate();
     static void ProcessPendingChatQueue();
-    static void LogReactionChanged(int32_t faction, int32_t reaction);
+    static void LogReactionChanged(int32_t faction, UNIT_REACTION reaction);
     static void LogFactionChanged(int32_t faction, int32_t delta, int32_t generic, float bonus);
     static void EnterWorld();
     static void InitializeGame();

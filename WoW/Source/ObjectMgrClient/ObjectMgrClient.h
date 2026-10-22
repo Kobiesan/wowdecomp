@@ -16,7 +16,10 @@ class CGPlayer_C;
 class CHashKeyGUID;
 class CMovementGlobals;
 class RealmConnection;
-enum HANDLER_PRIORITY : int32_t;
+enum HANDLER_PRIORITY : int32_t {
+    HANDLER_PRIORITY_NORMAL = 0,
+    HANDLER_PRIORITY_HIGH = 1,
+};
 
 typedef int32_t (*MIRRORHANDLERFUNC)(WOWGUID guid, uint32_t fieldOffset, uint32_t fieldSize, const void* oldValue, void* param);
 typedef int32_t (*OBJECTENUMFUNC)(WOWGUID guid, void* param);
@@ -34,7 +37,7 @@ class CMirrorHandler : public TSLinkedNode<CMirrorHandler> {
     /* 002C */ uint8_t m_dispatching;
     /* 002D */ uint8_t m_deletePending;
     /* 002E */ uint8_t m_alwaysFire;
-    /* 002F */ uint8_t unk_002F;
+    /* 002F */ uint8_t unused_002F;
 
     ~CMirrorHandler();
 };
@@ -46,7 +49,7 @@ class ObjectMgr {
     /* 0050 */ TSExplicitList<CGObject_C, offsetof(CGObject_C, m_link)> m_lazyCleanupFifo [NUM_CLIENT_OBJECT_TYPES - 1];
     /* 00A4 */ TSExplicitList<CGObject_C, offsetof(CGObject_C, m_link)> m_visibleObjects;
     /* 00B0 */ TSExplicitList<CGObject_C, offsetof(CGObject_C, m_link)> m_reenabledObjects;
-    /* 00BC */ uint32_t unk_00BC;
+    /* 00BC */ uint32_t unused_00BC;
     /* 00C0 */ WOWGUID m_playerGuid;
     /* 00C8 */ uint32_t m_type;
     /* 00CC */ uint32_t m_mapId;

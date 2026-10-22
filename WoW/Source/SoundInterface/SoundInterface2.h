@@ -7,6 +7,7 @@
 #include "Engine/Source/SoundEngine/SoundEngine.h"
 #include "Engine/Source/Storm/H/stpl.h"
 #include "Engine/Source/Tempest/C3Vector.h"
+#include "WoW/Source/SoundInterface/Types.h"
 
 class CGUnit_C;
 class CGUnitVirtualItem;
@@ -54,7 +55,7 @@ class SE2SoundKitObject {
     /* 0000 */ TSLink<SE2SoundKitObject> m_link;
     /* 0008 */ SESound m_sound;
     /* 000C */ uint32_t m_advancedId;
-    /* 0010 */ uint32_t unk_0010;
+    /* 0010 */ uint32_t unused_0010;
 
     SE2SoundKitObject();
     ~SE2SoundKitObject();
@@ -66,7 +67,7 @@ class SI2SoundUserData : public SESoundUserData {
     /* 0008 */ int32_t m_soundKitId;
     /* 000C */ VSOUNDKITDEF* m_def;
     /* 0010 */ int32_t m_group;
-    /* 0014 */ uint32_t unk_0014;
+    /* 0014 */ uint32_t unused_0014;
     /* 0018 */ uint32_t m_advancedId;
 
     virtual ~SI2SoundUserData();
@@ -163,7 +164,7 @@ class SI2 {
     static int32_t PlayFoleySound(int32_t materialId, const C3Vector* position, int32_t self);
     static void PlayFootstepSound(int32_t footstepId, const C3Vector* position, int32_t terrainType, int32_t splash, int32_t loud, CGUnit_C* unit);
     static void PlayHitSound(const CGUnitVirtualItem* weapon, int32_t impactType, int32_t crit, const C3Vector* position, int32_t self);
-    static void PlayItemSound(int32_t type, int32_t displayId);
+    static void PlayItemSound(ITEMSOUNDTYPE type, int32_t displayId);
     static int32_t PlayMissedSound(bool oneHand, const C3Vector* position, int32_t self);
     static void PlayParrySound(const CGUnitVirtualItem* weapon, const CGUnitVirtualItem* defender, int32_t crit, const C3Vector* position, int32_t self);
     static int32_t PlaySheatheSound(const CGUnitVirtualItem* item, int32_t sheathe, const C3Vector* position, int32_t self);
@@ -252,6 +253,6 @@ class SI2 {
 };
 
 class CGItem_C;
-int32_t SndInterfacePlayItemSound(int32_t type, CGItem_C* item);
+int32_t SndInterfacePlayItemSound(ITEMSOUNDTYPE type, CGItem_C* item);
 
 #endif

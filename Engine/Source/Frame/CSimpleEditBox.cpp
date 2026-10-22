@@ -1985,7 +1985,7 @@ void CSimpleEditBox::CreateCandidatesFrame() {
     CLayoutFrame* relative = this->m_clauseHighlight ? static_cast<CLayoutFrame*>(this->m_clauseHighlight) : static_cast<CLayoutFrame*>(this->m_highlightTextures[0]);
     this->m_candidatesFrame->SetPoint(FRAMEPOINT_BOTTOMLEFT, relative, FRAMEPOINT_TOPLEFT, 0.0f, 0.0f, 1);
     this->m_candidatesFrame->m_fading = 0;
-    this->m_candidatesFrame->SetInsertMode(0);
+    this->m_candidatesFrame->SetInsertMode(INSERT_AT_TOP);
 
     CSimpleTexture* background = nullptr;
     data = CSimpleTexture::s_allocator.GetData(0, typeid(CSimpleTexture).raw_name(), SLOG_OBJECT);
@@ -2891,9 +2891,9 @@ int32_t CSimpleEditBox::OnLayerKeyDown(const CKeyEvent& evt) {
 
         case KEY_ENTER:
             if (!(this->m_editBoxFlags & 0x2) || this->m_onEnterPressed.m_luaRef) {
-                this->m_simpleTop->unk_1250 = 1;
+                this->m_simpleTop->unused_1250 = 1;
                 this->RunOnEnterPressedScript();
-                this->m_simpleTop->unk_1250 = 0;
+                this->m_simpleTop->unused_1250 = 0;
             } else {
                 this->Insert("\n", nullptr, 1, 0, 0);
             }

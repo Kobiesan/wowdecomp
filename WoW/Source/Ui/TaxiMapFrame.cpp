@@ -78,7 +78,7 @@ static TSFixedArray<TSGrowableArray<TaxiPathRec*>> s_paths;
 static TSGrowableArray<TAXILINE> s_taxiLines;
 
 // STATIC: 0x00C0DC70
-static TSGrowableArray<uint8_t> s_unkC0DC70;
+static TSGrowableArray<uint8_t> s_unused_C0DC70;
 
 // VERIFY: cc1d814f auto
 // OFFSET: 0x00590690
@@ -211,14 +211,14 @@ int32_t TaxiNodeCost(uint32_t index) {
         return 0;
     }
 
-    int32_t reaction = taxiUnit->UnitReaction(player);
+    UNIT_REACTION reaction = taxiUnit->UnitReaction(player);
     FactionTemplateRec* factionTemplate = g_factionTemplateDB.GetRecord(taxiUnit->m_unit->m_unitFieldFactiontemplate);
 
     if (factionTemplate && !CGUnit_C::FactionHasReputation(factionTemplate->m_faction)) {
-        reaction = 3;
+        reaction = UNIT_REACTION_NEUTRAL;
     }
 
-    if (reaction > 3) {
+    if (reaction > UNIT_REACTION_NEUTRAL) {
         return node.m_costs[reaction - 3];
     }
 
@@ -643,7 +643,7 @@ void CGTaxiMap::InitializeGame() {
         }
     }
 
-    s_unkC0DC70.SetCount(CGTaxiMap::m_maxNodeID);
+    s_unused_C0DC70.SetCount(CGTaxiMap::m_maxNodeID);
     CGTaxiMap::m_routeLines.SetCount(CGTaxiMap::m_maxNodeID);
 
     for (int32_t i = g_taxiPathDB.m_numRecords - 1; i >= 0; i--) {
