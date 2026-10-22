@@ -1679,6 +1679,19 @@ void CCharacterComponent::ValidateComponentData(ComponentData* data, COMPONENT_C
     }
 }
 
+// TBV: male goblins (race 9) take their jaw (geosets 102-105) from the face instead of the
+// facial-hair row, so Facial Hair only picks the beard. Faces 0-7 are the normal faces and 8-15
+// the matching Death Knight faces. Order: Grin 102, Shut 103, Sneer 104, Snarl 105.
+static const int32_t s_tbvGoblinMaleFaceJaw[8] = { 102, 103, 104, 105, 102, 103, 104, 105 };
+
+static int32_t TBV_JawGeoset(const CharacterPreferences& prefs, int32_t styleGeoset) {
+    if (prefs.m_raceID == 9 && prefs.m_sexID == 0) {
+        return s_tbvGoblinMaleFaceJaw[prefs.m_faceId % 8];
+    }
+
+    return styleGeoset;
+}
+
 // VERIFY: 43fe9206 auto
 // OFFSET: 0x004EA000
 static CharacterFacialHairStylesRec* GetConditionalFacialHairStyle(CharacterPreferences* prefs) {
@@ -1866,6 +1879,11 @@ void CCharacterComponent::SetFace(int32_t faceID, bool loadHair, const char* deb
         this->LoadBaseVariation(VARIATION_HAIR, 2, this->m_data.m_preferences.m_hairStyleId, this->m_data.m_preferences.m_hairColorId, SECTION_HEAD_UPPER, debug);
     }
 
+    // TBV: a new face means a new jaw for male goblins. 101 means a helmet hides the jaw; leave it.
+    if (this->m_data.m_geosets[1] != 101) {
+        this->m_data.m_geosets[1] = TBV_JawGeoset(this->m_data.m_preferences, this->m_data.m_geosets[1]);
+    }
+
     this->m_flags |= 0x4;
     this->SetDirtySections(0x300);
 }
@@ -1881,7 +1899,7 @@ void CCharacterComponent::SetBeardStyle(int32_t facialHairID, bool loadVariation
     CharacterFacialHairStylesRec* styleRec = GetConditionalFacialHairStyle(&this->m_data.m_preferences);
 
     if (styleRec) {
-        this->m_data.m_geosets[1] = styleRec->m_geoset[0] + 100;
+        this->m_data.m_geosets[1] = TBV_JawGeoset(this->m_data.m_preferences, styleRec->m_geoset[0] + 100);  // TBV: jaw from face
         this->m_data.m_geosets[3] = styleRec->m_geoset[1] + 300;
         this->m_data.m_geosets[2] = styleRec->m_geoset[2] + 200;
         this->m_data.m_geosets[16] = styleRec->m_geoset[3] + 1600;
@@ -3708,7 +3726,7 @@ void CCharacterComponent::RemoveItem(ITEM_SLOT itemSlot) {
             CharacterFacialHairStylesRec* styleRec = GetConditionalFacialHairStyle(&this->m_data.m_preferences);
 
             if (styleRec) {
-                this->m_data.m_geosets[1] = styleRec->m_geoset[0] + 100;
+                this->m_data.m_geosets[1] = TBV_JawGeoset(this->m_data.m_preferences, styleRec->m_geoset[0] + 100);  // TBV: jaw from face
                 this->m_data.m_geosets[3] = styleRec->m_geoset[1] + 300;
                 this->m_data.m_geosets[2] = styleRec->m_geoset[2] + 200;
                 this->m_data.m_geosets[7] = 702;
