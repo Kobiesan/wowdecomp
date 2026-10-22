@@ -386,7 +386,34 @@ static FMOD_RESULT F_CALLBACK SENonBlockCallback(FMOD_SOUND* fmodSound, FMOD_RES
     SOUND_INTERNAL_LOOKUP* lookup = s_soundLookup.Ptr(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(userdata)), s_lookupKey);
 
     if (!lookup) {
+        // TBV: the sound that started this load was stopped and freed before the load finished
+        // (e.g. a long emote voice restarted on the same unit). Without this, every other sound
+        // waiting on the same file is never started, and the cached file stays "loading" for the
+        // rest of the session, so that voice line is silent from then on.
+        for (SESoundInternal* other = s_soundList.Head(); other; other = s_soundList.Next(other)) {
+            if (other->m_type == SESOUNDTYPE_FILE && static_cast<SEFileSound*>(other)->m_sound == reinterpret_cast<FMOD::Sound*>(fmodSound) && !other->m_channel) {
+                if (result == FMOD_OK) {
+                    s_goList.LinkToTail(other);
+                } else {
+                    s_deleteList.LinkToTail(other);
+                }
+            }
+        }
+
         s_soundListCritSect.Leave();
+
+        if (result == FMOD_OK) {
+            s_createCritSect.Enter();
+
+            for (SEWaveDataNode* node = s_waveDataList.Head(); node; node = s_waveDataList.Next(node)) {
+                if (node->m_sound == reinterpret_cast<FMOD::Sound*>(fmodSound)) {
+                    node->m_loaded = 1;
+                }
+            }
+
+            s_createCritSect.Leave();
+        }
+
         return FMOD_OK;
     }
 
@@ -2676,7 +2703,8 @@ static void ProcessGoGoGoList() {
 
         s_soundListCritSect.Leave();
 
-        if (sound) {
+        // TBV: skip sounds already started directly (see the cache-hit recovery in CreateWaveData)
+        if (sound && !static_cast<SEFileSound*>(sound)->m_loadCompleted) {
             static_cast<SEFileSound*>(sound)->CompleteNonBlockingLoad();
         }
     } while (s_goList.Head());
@@ -2882,6 +2910,16 @@ int32_t SE2::CreateWaveData(FMOD::System* system, const char* filename, FMOD_MOD
                 node->m_refCount++;
 
                 loaded = 0;
+
+                if (!node->m_loaded) {
+                    // TBV: recover a cached file whose load finished without its completion
+                    // callback reaching us; otherwise this sound would wait forever.
+                    FMOD_OPENSTATE openState;
+
+                    if (node->m_sound && node->m_sound->getOpenState(&openState, nullptr, nullptr) == FMOD_OK && openState == FMOD_OPENSTATE_READY) {
+                        node->m_loaded = 1;
+                    }
+                }
 
                 if (node->m_loaded) {
                     s_cacheHitsLoaded++;
