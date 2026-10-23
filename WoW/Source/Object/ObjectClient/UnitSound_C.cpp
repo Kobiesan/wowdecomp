@@ -481,7 +481,6 @@ void CGUnit_C::PlayTextEmoteSound(uint32_t emote, uint32_t emoteNum) {
     CVar* cvar = CVar::Lookup("Sound_EnableEmoteSounds");
 
     if (!cvar || !cvar->m_intValue) {
-        SE2::Log_Write("TBV-EMOTE text unit=%08X%08X emote=%u: skipped, Sound_EnableEmoteSounds off", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), emote);  // TBV-DEBUG
         return;
     }
 
@@ -489,21 +488,16 @@ void CGUnit_C::PlayTextEmoteSound(uint32_t emote, uint32_t emoteNum) {
         WOWGUID guid = this->m_obj->m_guid;
 
         if (!CGGameUI::IsInParty(guid)) {
-            SE2::Log_Write("TBV-EMOTE text unit=%08X%08X emote=%u: skipped, not you and not in party", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), emote);  // TBV-DEBUG
             return;
         }
     }
 
     int32_t soundKitId = SI2::GetTextEmoteSoundID(emote, this->GetDisplayRace(), this->GetVoiceSex());
 
-    // TBV-DEBUG
-    SE2::Log_Write("TBV-EMOTE text unit=%08X%08X emote=%u num=%u race=%u sex=%u kit=%d", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), emote, emoteNum, this->GetDisplayRace(), this->GetVoiceSex(), soundKitId);
-
     if (this->IsShapeShifted()) {
         SpellShapeshiftFormRec* form = g_spellShapeshiftFormDB.GetRecord(this->GetShapeshiftForm());
 
         if (form && (form->m_flags & 0x1000)) {
-            SE2::Log_Write("TBV-EMOTE text unit=%08X%08X emote=%u: skipped, shapeshift form", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), emote);  // TBV-DEBUG
             return;
         }
     }
@@ -609,7 +603,6 @@ int32_t CGUnit_C::GetUnitSoundKitIndex(UNITSOUNDTYPE soundType) const {
 // OFFSET: 0x00746D60
 void CGUnit_C::PlayEmoteSound(int32_t soundKitId, bool checkCVars, int32_t fileIndex) {
     if ((this->m_obj->m_type & TYPE_PLAYER) && this->m_unit->m_unitFieldHealth <= 0) {
-        SE2::Log_Write("TBV-EMOTE play unit=%08X%08X kit=%d: skipped, dead player", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), soundKitId);  // TBV-DEBUG
         return;
     }
 
@@ -641,7 +634,6 @@ void CGUnit_C::PlayEmoteSound(int32_t soundKitId, bool checkCVars, int32_t fileI
     }
 
     if ((this->m_obj->m_type & TYPE_PLAYER) && static_cast<CGPlayer_C*>(this)->m_dance) {
-        SE2::Log_Write("TBV-EMOTE play unit=%08X%08X kit=%d: skipped, dance studio active", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), soundKitId);  // TBV-DEBUG
         return;
     }
 
@@ -674,14 +666,7 @@ void CGUnit_C::PlayEmoteSound(int32_t soundKitId, bool checkCVars, int32_t fileI
         SI2::DK_GetPlayerFilterName(this, properties.m_dspChainName, sizeof(properties.m_dspChainName));
     }
 
-    // TBV-DEBUG: the previous reaction sound on this unit is stopped inside PlaySoundKit
-    uint32_t previousId = this->m_reactionSound.m_sound.GetID();
-    bool previousPlaying = this->m_reactionSound.m_sound.IsPlaying();
-
-    int32_t result = SI2::PlaySoundKit(soundKitId, atCharacter ? nullptr : &position, &this->m_reactionSound, &properties, 0, nullptr, 1, 0);
-
-    // TBV-DEBUG
-    SE2::Log_Write("TBV-EMOTE play unit=%08X%08X kit=%d file=%d local=%d atChar=%d prev=%u prevPlaying=%d -> result=%d new=%u playing=%d", static_cast<uint32_t>(this->m_obj->m_guid.m_guid >> 32), static_cast<uint32_t>(this->m_obj->m_guid.m_guid), soundKitId, fileIndex, local, atCharacter, previousId, previousPlaying ? 1 : 0, result, this->m_reactionSound.m_sound.GetID(), this->m_reactionSound.m_sound.IsPlaying() ? 1 : 0);
+    SI2::PlaySoundKit(soundKitId, atCharacter ? nullptr : &position, &this->m_reactionSound, &properties, 0, nullptr, 1, 0);
 
     if (!atCharacter) {
         SI2::AttachToObject(&this->m_reactionSound, this->m_obj->m_guid);

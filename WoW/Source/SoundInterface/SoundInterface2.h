@@ -202,7 +202,6 @@ class SI2 {
     static int32_t ShutDown(int32_t restart);
     static void ShutdownZoneSoundsHandler();
     static void SoundFinished(SESound* sound, void* param);
-    static void TBV_LogSuppressors(const char* reason);  // TBV-DEBUG
     static void StartCreditsMusic(const char* name);
     static void StartGlueAmbience(const char* name, float fadeInTime);
     static void StartGlueMusic(const char* name);

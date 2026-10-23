@@ -520,27 +520,10 @@ void SI2::SoundFinished(SESound* sound, void* param) {
         for (uint32_t i = 0; i < SI2::s_suppressors.Count(); i++) {
             if (SI2::s_suppressors[i] == id) {
                 SI2::s_suppressors[i] = 0;
-                SE2::Log_Write("TBV-EMOTE finished kit=%d sound=%u: lock released", id, sound->GetID());  // TBV-DEBUG
                 return;
             }
         }
-
-        SE2::Log_Write("TBV-EMOTE finished kit=%d sound=%u: no lock held", id, sound->GetID());  // TBV-DEBUG
     }
-}
-
-// TBV-DEBUG: lists the sound kits currently locked by the suppressor list
-void SI2::TBV_LogSuppressors(const char* reason) {
-    char text[400] = "";
-    uint32_t length = 0;
-
-    for (uint32_t i = 0; i < SI2::s_suppressors.Count() && length < sizeof(text) - 16; i++) {
-        if (SI2::s_suppressors[i]) {
-            length += static_cast<uint32_t>(SStrPrintf(text + length, sizeof(text) - length, " %u", SI2::s_suppressors[i]));
-        }
-    }
-
-    SE2::Log_Write("TBV-EMOTE locks (%s):%s", reason, length ? text : " none");
 }
 
 // VERIFY: 551d00f9 auto
@@ -581,7 +564,6 @@ int32_t SI2::StopSound(SE2SoundKitObject* object, int32_t immediate, float fadeO
             for (uint32_t i = 0; i < SI2::s_suppressors.Count(); i++) {
                 if (SI2::s_suppressors[i] == id) {
                     SI2::s_suppressors[i] = 0;
-                    SE2::Log_Write("TBV-EMOTE stop kit=%d sound=%u playing=%d: lock released", id, object->m_sound.GetID(), object->m_sound.IsPlaying() ? 1 : 0);  // TBV-DEBUG
                     break;
                 }
             }
@@ -762,9 +744,6 @@ int32_t SI2::PlaySoundKit(int32_t soundKitId, const C3Vector* position, SE2Sound
     if (def->m_flags & 0x20) {
         for (uint32_t i = 0; i < SI2::s_suppressors.Count(); i++) {
             if (SI2::s_suppressors[i] == static_cast<uint32_t>(soundKitId)) {
-                // TBV-DEBUG
-                SE2::Log_Write("TBV-EMOTE blocked kit=%d: kit is still locked (object sound=%u playing=%d)", soundKitId, object ? object->m_sound.GetID() : 0, (object && object->m_sound.IsPlaying()) ? 1 : 0);
-                SI2::TBV_LogSuppressors("blocked");
                 return 15;
             }
         }
@@ -913,8 +892,6 @@ int32_t SI2::PlaySoundKit(int32_t soundKitId, const C3Vector* position, SE2Sound
         if (i >= SI2::s_suppressors.Count()) {
             *SI2::s_suppressors.New() = soundKitId;
         }
-
-        SE2::Log_Write("TBV-EMOTE lock kit=%d sound=%u file=%s", soundKitId, sound->GetID(), file);  // TBV-DEBUG
     }
 
     if (properties->m_useDspChain) {
@@ -928,12 +905,6 @@ int32_t SI2::PlaySoundKit(int32_t soundKitId, const C3Vector* position, SE2Sound
     }
 
     sound->Play();
-
-    if (def->m_flags & 0x20) {
-        // TBV-DEBUG: playing=0 here means the file is still loading and starts later
-        SE2::Log_Write("TBV-EMOTE start kit=%d sound=%u playing=%d", soundKitId, sound->GetID(), sound->IsPlaying() ? 1 : 0);
-    }
-
     return 0;
 }
 
