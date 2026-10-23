@@ -81,6 +81,13 @@ void SI2::InitEmoteSounds() {
 
     s_numTextEmotes = count;
 
+    // TBV: reserve every lookup up front. s_textEmoteLookupById keeps pointers into s_textEmoteLookups,
+    // so letting New() grow the array moved earlier lookups and left those pointers on freed memory.
+    // EmotesTextSound rows added for custom races come after other emotes' rows, so they then wrote
+    // sound IDs into freed memory: emotes such as /hello went silent and the heap was corrupted.
+    // count is the number of runs of equal emote IDs, which is never less than the number of lookups.
+    s_textEmoteLookups.Reserve(count, 0);
+
     for (int32_t i = 0; i < g_emotesTextSoundDB.m_numRecords; i++) {
         EmotesTextSoundRec* rec = (i < 0 || i >= g_emotesTextSoundDB.m_numRecords) ? nullptr : &g_emotesTextSoundDB.m_records[i];
         uint32_t id = rec->m_emotesTextID;

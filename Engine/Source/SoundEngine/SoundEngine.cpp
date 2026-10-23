@@ -386,6 +386,8 @@ static FMOD_RESULT F_CALLBACK SENonBlockCallback(FMOD_SOUND* fmodSound, FMOD_RES
     SOUND_INTERNAL_LOOKUP* lookup = s_soundLookup.Ptr(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(userdata)), s_lookupKey);
 
     if (!lookup) {
+        SE2::Log_Write("TBV-EMOTE load done result=%d starter=%u: starter already freed", result, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(userdata)));  // TBV-DEBUG
+
         // TBV: the sound that started this load was stopped and freed before the load finished
         // (e.g. a long emote voice restarted on the same unit). Without this, every other sound
         // waiting on the same file is never started, and the cached file stays "loading" for the
@@ -420,6 +422,7 @@ static FMOD_RESULT F_CALLBACK SENonBlockCallback(FMOD_SOUND* fmodSound, FMOD_RES
     SEFileSound* sound = static_cast<SEFileSound*>(lookup->m_sound);
 
     if (result != FMOD_OK) {
+        SE2::Log_Write("TBV-EMOTE load failed result=%d sound=%u", result, sound->m_id);  // TBV-DEBUG
         sound->m_deleteDelay = 0;
         s_deleteList.LinkToTail(sound);
 
@@ -1649,6 +1652,9 @@ int32_t SEFileSound::IsReadyForRelease() {
 // VERIFY: 3a718434 manual
 // OFFSET: 0x0087A070
 void SEFileSound::AbortNonBlockingLoad(FMOD_RESULT result) {
+    // TBV-DEBUG: an aborted sound never reports finished
+    SE2::Log_Write("TBV-EMOTE abort sound=%u result=%d stopped=%d cached=%d", this->m_id, result, this->m_stop, this->m_cached);
+
     if (this->m_sound) {
         if (result != FMOD_ERR_MAXAUDIBLE) {
             char name[256];
@@ -2706,6 +2712,9 @@ static void ProcessGoGoGoList() {
         // TBV: skip sounds already started directly (see the cache-hit recovery in CreateWaveData)
         if (sound && !static_cast<SEFileSound*>(sound)->m_loadCompleted) {
             static_cast<SEFileSound*>(sound)->CompleteNonBlockingLoad();
+
+            // TBV-DEBUG: a sound that waited for its file to load
+            SE2::Log_Write("TBV-EMOTE deferred start sound=%u channel=%d", sound->m_id, sound->m_channel ? 1 : 0);
         }
     } while (s_goList.Head());
 }
