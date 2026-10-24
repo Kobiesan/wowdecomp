@@ -729,6 +729,7 @@ void CGReputationInfo::EnterWorld() {
 
         CGReputationInfo::m_factionStandings[faction->m_reputationIndex].m_factionId = faction->m_id;
 
+        bool matchedSlot = false;
         for (uint32_t k = 0; k < 4; k++) {
             int32_t raceMask = faction->m_reputationRaceMask[k];
             int32_t classMask = faction->m_reputationClassMask[k];
@@ -745,7 +746,19 @@ void CGReputationInfo::EnterWorld() {
                 continue;
             }
 
+            matchedSlot = true;
             CGReputationInfo::m_factionStandings[faction->m_reputationIndex].m_base = faction->m_reputationBase[k];
+
+            if (CGReputationInfo::m_factionStandings[faction->m_reputationIndex].m_flags & 0x1) {
+                CGReputationInfo::AddVisibleFaction(faction->m_reputationIndex, 0);
+            }
+        }
+
+        // TBV: Custom races such as Goblin have no race/class slot in most city
+        // factions. If the server marks the faction visible, show it at base 0
+        // so discovered reputations survive a relog.
+        if (!matchedSlot) {
+            CGReputationInfo::m_factionStandings[faction->m_reputationIndex].m_base = 0;
 
             if (CGReputationInfo::m_factionStandings[faction->m_reputationIndex].m_flags & 0x1) {
                 CGReputationInfo::AddVisibleFaction(faction->m_reputationIndex, 0);
