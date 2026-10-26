@@ -5,7 +5,7 @@ set "ROOT=%~dp0"
 set "ROOT=%ROOT:~0,-1%"
 set "BUILD=%ROOT%\out\build\x64-Release"
 set "BIN=%ROOT%\bin"
-set "STAGE=%TEMP%\waystone_pkg"
+set "STAGE=%TEMP%\azeroth_online_pkg"
 set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 
 for /f "usebackq delims=" %%i in (`git -C "%ROOT%" rev-parse --short^=7 HEAD`) do set "HASH=%%i"
@@ -30,17 +30,17 @@ if errorlevel 1 goto :fail
 cmake --build "%BUILD%" --target Wow XvidDecoder
 if errorlevel 1 goto :fail
 
-if not exist "%BIN%\Win\Wow64.exe" goto :missing
-if not exist "%BIN%\Win\Wow64.map" goto :missing
+if not exist "%BIN%\Win\Azeroth Online.exe" goto :missing
+if not exist "%BIN%\Win\Azeroth Online.map" goto :missing
 if not exist "%BIN%\Win\XvidDecoder.dll" goto :missing
 
 if exist "%STAGE%" rmdir /s /q "%STAGE%"
 mkdir "%STAGE%"
-copy /y "%BIN%\Win\Wow64.exe" "%STAGE%\Waystone.exe" >nul
-copy /y "%BIN%\Win\Wow64.map" "%STAGE%\Waystone.map" >nul
+copy /y "%BIN%\Win\Azeroth Online.exe" "%STAGE%\Azeroth Online.exe" >nul
+copy /y "%BIN%\Win\Azeroth Online.map" "%STAGE%\Azeroth Online.map" >nul
 copy /y "%BIN%\Win\XvidDecoder.dll" "%STAGE%\XvidDecoder.dll" >nul
 
-set "ZIP=%BIN%\Waystone-%HASH%.zip"
+set "ZIP=%BIN%\Azeroth-Online-%HASH%.zip"
 powershell -NoProfile -Command "Compress-Archive -Path '%STAGE%\*' -DestinationPath '%ZIP%' -Force"
 if errorlevel 1 goto :fail
 rmdir /s /q "%STAGE%"

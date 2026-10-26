@@ -2,13 +2,14 @@ file(GLOB CLIENT_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/WoW/Source/*.cpp
 
 if (WOWDECOMP_ARCH_64)
     file(GLOB CLIENT_PLATFORM_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/WoW/Source/Win64/*.cpp")
-    set(WOWCLIENT_OUTPUT_NAME WowClient64)
+    # TBV: the diagnostic build gets a distinct name so it can coexist with the release "Azeroth Online" executable.
+    set(WOWCLIENT_OUTPUT_NAME "Azeroth Online Dev")
 else ()
     file(GLOB CLIENT_PLATFORM_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/WoW/Source/Win32/*.cpp")
-    set(WOWCLIENT_OUTPUT_NAME WowClient32)
+    set(WOWCLIENT_OUTPUT_NAME "Azeroth Online Dev 32")
 endif ()
 
-set(WOWCLIENT_OUTPUT_OVERRIDE "" CACHE STRING "WowClient executable name instead of WowClient64/WowClient32 (re/tools/build sets Waystone / WaystoneDev)")
+set(WOWCLIENT_OUTPUT_OVERRIDE "" CACHE STRING "WowClient executable name instead of Azeroth Online Dev/Azeroth Online Dev 32")
 if (WOWCLIENT_OUTPUT_OVERRIDE)
     set(WOWCLIENT_OUTPUT_NAME ${WOWCLIENT_OUTPUT_OVERRIDE})
 endif ()

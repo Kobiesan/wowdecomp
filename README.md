@@ -67,8 +67,8 @@ The client is written to `bin/Win/`:
 
 | Target | x64 | Win32 |
 |---|---|---|
-| `WowClient` | `WowClient64.exe` | `WowClient32.exe` |
-| `Wow` | `Wow64.exe` | `Wow32.exe` |
+| `WowClient` | `Azeroth Online Dev.exe` | `Azeroth Online Dev 32.exe` |
+| `Wow` | `Azeroth Online.exe` | `Azeroth Online 32.exe` |
 
 `WowClient` is the client with a crash logger: it opens a console window and writes
 `WowClient_crash.log` when the client crashes. `Wow` is the same client without it. You can also turn the
@@ -80,13 +80,13 @@ logger off in `WowClient` with `-DWOWCLIENT_CRASH_LOG=OFF`.
 |---|---|---|
 | `WOWDECOMP_DISABLE_SIGNATURE_CHECKS` | `OFF` | Skip the MPQ file and `.toc.sig` signature checks, so modified game data and interface files load |
 | `WOWCLIENT_CRASH_LOG` | `ON` | Build `WowClient` with the crash logger |
-| `WOWCLIENT_OUTPUT_OVERRIDE` | empty | Name the `WowClient` executable something other than `WowClient64` / `WowClient32` |
+| `WOWCLIENT_OUTPUT_OVERRIDE` | empty | Name the `WowClient` executable something other than `Azeroth Online Dev` / `Azeroth Online Dev 32` |
 
 ## Running
 
 1. Copy the `Data` folder of your 3.3.5a client into `bin/Win/`, so you have `bin/Win/Data/`.
 2. Point `Data/<locale>/realmlist.wtf` at the server you want to connect to.
-3. Start `bin/Win/WowClient64.exe` (or `Wow64.exe`).
+3. Start `bin/Win/Azeroth Online.exe` (or `Azeroth Online Dev.exe`).
 
 ## Layout
 

@@ -9,9 +9,10 @@ endif ()
 add_executable(Wow WIN32 ${PRIVATE_SOURCES} ${PLATFORM_SOURCES})
 
 if (WOWDECOMP_ARCH_64)
-    set(WOW_OUTPUT_NAME Wow64)
+    # TBV: the release client is branded Azeroth Online.
+    set(WOW_OUTPUT_NAME "Azeroth Online")
 else ()
-    set(WOW_OUTPUT_NAME Wow32)
+    set(WOW_OUTPUT_NAME "Azeroth Online 32")
 endif ()
 
 set_target_properties(Wow PROPERTIES
