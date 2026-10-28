@@ -46,7 +46,7 @@ struct FACTION : public TSHashObject<FACTION, HASHKEY_NONE> {
 class CGReputationInfo {
     public:
     static TSGrowableArray<const FactionRec*>* GetFactionChildren(int32_t faction);
-    static FactionStanding m_factionStandings[128];
+    static FactionStanding m_factionStandings[512];
     static const int32_t m_reactionThresholds[NUM_UNIT_REACTIONS + 1];
     static FactionHeader* m_headers[64];
     static uint32_t m_numHeaders;
